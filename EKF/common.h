@@ -350,6 +350,13 @@ struct parameters {
 
 	// control of on-ground movement check
 	float is_moving_scaler{1.0f};		///< gain scaler used to adjust the threshold for the on-ground movement detection. Larger values make the test less sensitive.
+
+	//manual local origin set
+	int32_t lcl_org_set{0};
+	float lcl_org_lat{528170720.0f};
+	float lcl_org_lon{-41255690.0f};
+	float lcl_org_alt{73000.0f};
+
 };
 
 struct stateSample {

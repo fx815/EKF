@@ -61,9 +61,19 @@ bool Ekf::collect_gps(const gps_message &gps)
 	// Run GPS checks always
 	bool gps_checks_pass = gps_is_good(gps);
 	if (!_NED_origin_initialised && gps_checks_pass) {
-		// If we have good GPS data set the origin's WGS-84 position to the last gps fix
-		double lat = gps.lat / 1.0e7;
-		double lon = gps.lon / 1.0e7;
+		
+		double lat;
+		double lon;
+		if(_params.lcl_org_set > 0){
+			lat = (double)_params.lcl_org_lat / 1.0e7;
+			lon = (double)_params.lcl_org_lon / 1.0e7;
+		}else{
+			// If we have good GPS data set the origin's WGS-84 position to the last gps fix
+			lat = gps.lat / 1.0e7;
+			lon = gps.lon / 1.0e7;
+		}
+		
+		
 		map_projection_init_timestamped(&_pos_ref, lat, lon, _time_last_imu);
 
 		// if we are already doing aiding, correct for the change in position since the EKF started navigationg
@@ -73,8 +83,13 @@ bool Ekf::collect_gps(const gps_message &gps)
 			map_projection_init_timestamped(&_pos_ref, est_lat, est_lon, _time_last_imu);
 		}
 
-		// Take the current GPS height and subtract the filter height above origin to estimate the GPS height of the origin
-		_gps_alt_ref = 1e-3f * (float)gps.alt + _state.pos(2);
+		if(_params.lcl_org_set > 0){
+			_gps_alt_ref = 1e-3f * _params.lcl_org_alt;
+		}else{
+			// Take the current GPS height and subtract the filter height above origin to estimate the GPS height of the origin
+			_gps_alt_ref = 1e-3f * (float)gps.alt + _state.pos(2);
+		}
+		
 		_NED_origin_initialised = true;
 		_last_gps_origin_time_us = _time_last_imu;
 
