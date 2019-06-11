@@ -65,8 +65,8 @@ bool Ekf::collect_gps(const gps_message &gps)
 		double lat;
 		double lon;
 		if(_params.lcl_org_set > 0){
-			lat = (double)_params.lcl_org_lat / 1.0e7;
-			lon = (double)_params.lcl_org_lon / 1.0e7;
+			lat = (double)_params.lcl_org_lat;
+			lon = (double)_params.lcl_org_lon;
 		}else{
 			// If we have good GPS data set the origin's WGS-84 position to the last gps fix
 			lat = gps.lat / 1.0e7;
@@ -84,7 +84,7 @@ bool Ekf::collect_gps(const gps_message &gps)
 		}
 
 		if(_params.lcl_org_set > 0){
-			_gps_alt_ref = 1e-3f * _params.lcl_org_alt;
+			_gps_alt_ref = _params.lcl_org_alt;
 		}else{
 			// Take the current GPS height and subtract the filter height above origin to estimate the GPS height of the origin
 			_gps_alt_ref = 1e-3f * (float)gps.alt + _state.pos(2);
